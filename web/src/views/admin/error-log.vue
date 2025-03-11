@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
   import { message } from 'ant-design-vue';
-  import { clearErrorLogListApi, listErrorLogListApi } from '/@/api/log';
+  import { clearErrorLogListApi, listErrorLogListApi } from '/@/api/errorLog';
 
   const columns = reactive([
     {
