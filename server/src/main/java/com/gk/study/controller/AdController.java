@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * @author lengqin1024(微信)
- * @email net936@163.com
+ * @author 
+ * @email 
  */
 @RestController
 @RequestMapping("/ad")

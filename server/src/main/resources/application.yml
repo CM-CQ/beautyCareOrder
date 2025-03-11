@@ -2,15 +2,16 @@
 server.port: 9100
 server.servlet.context-path: /api
 
-BASE_LOCATION: D:\aliyun_workspace\java_face
-DB_NAME: java_face
+BASE_LOCATION: D:\aliyun_workspace\beauty_care_order
+DB_NAME: beauty_care_order
 
 
 spring:
   datasource:
     username: root
-    password: 4643830
-    url: jdbc:mysql://localhost:3306/${DB_NAME}?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+    password: root
+    #    password: 4643830
+    url: jdbc:mysql://127.0.0.1:3306/beauty_care_order?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC&autoReconnect=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
 
@@ -59,3 +60,14 @@ spring:
         #这里配true才能访问监控页面！
         enabled: true
 
+  mvc:
+    # URL响应地址（Springboot默认为/**)
+    static-path-pattern: /staticfiles/**
+  web:
+    resources:
+      # 静态文件地址，保留官方内容后，进行追加
+      static-locations: classpath:/static,classpath:/public,classpath:/resources,classpath:/META-INF/resources,file:upload
+
+
+File:
+  uploadPath: ./upload/
