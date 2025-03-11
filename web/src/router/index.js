@@ -20,7 +20,9 @@ router.beforeEach(async (to, from, next) => {
 
   /** 后台路由 **/
   if (to.path.startsWith('/admin')) {
+    //判断管理员是否有登录的token
     if (localStorage.getItem(ADMIN_USER_TOKEN)) {
+      //若管理员有登录但是它去向却是管理员登录界面
       if (to.path === adminLoginRoutePath) {
         next({ path: '/' });
       } else {
@@ -31,6 +33,7 @@ router.beforeEach(async (to, from, next) => {
         // 在免登录名单，直接进入
         next();
       } else {
+        //管理员账号未登录 且未在免登录页面名单里 去向管理员登录界面
         next({ path: adminLoginRoutePath, query: { redirect: to.fullPath } });
       }
     }

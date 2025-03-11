@@ -3,7 +3,7 @@
     <a-layout-header style="background: #fff; padding: 0">
       <div class="header">
         <img class="header-logo" src="/src/assets/images/ic-admin-logo.png" />
-        <span class="header-title">后台管理</span>
+        <span class="header-title">美容预约系统后台管理</span>
         <div class="empty"></div>
         <a-button style="margin-right: 24px" @click="handlePreview">前台预览</a-button>
         <span>管理员[{{ userStore.admin_user_name }}]</span>
