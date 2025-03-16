@@ -43,6 +43,7 @@ router.beforeEach(async (to, from, next) => {
   /** 前台路由 **/
   if (to.path.startsWith('/index')) {
     if (localStorage.getItem(USER_TOKEN)) {
+      //用户已经登录但是去向的页面是用户登录页面
       if (to.path === loginRoutePath) {
         next({ path: '/' });
       } else {

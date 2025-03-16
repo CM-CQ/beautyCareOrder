@@ -27,7 +27,16 @@
         }"
       >
         <template #bodyCell="{ text, record, index, column }">
-          <template v-if="column.key === 'operation'">
+          <template v-if="column.key === 'status'">
+            <span>
+              <a-tag
+                :color="record.status === '0' ? 'green' : 'red'"
+              >
+                {{ record.status === '0' ? "上架":"下架" }}
+              </a-tag>
+            </span>
+          </template>
+          <template v-else-if="column.key === 'operation'">
             <span>
               <a @click="handleEdit(record)">编辑</a>
               <a-divider type="vertical" />
@@ -73,10 +82,28 @@
               </a-col>
               <a-col span="24">
                 <a-form-item label="封面图">
+<!--                  <a-upload-->
+<!--                    v-model:file-list="fileList"-->
+<!--                    name="picture"-->
+<!--                    list-type="picture-card"-->
+<!--                    class="picture-uploader"-->
+<!--                    :show-upload-list="false"-->
+<!--                    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"-->
+<!--                    :before-upload="beforeUpload"-->
+<!--                    @change="handleChange"-->
+<!--                  >-->
+<!--                    <img v-if="modal.form.coverUrl" :src="modal.form.coverUrl" alt="avatar" />-->
+<!--                    <div v-else>-->
+<!--                      <loading-outlined v-if="loading"></loading-outlined>-->
+<!--                      <plus-outlined v-else></plus-outlined>-->
+<!--                      <div class="ant-upload-text">Upload</div>-->
+<!--                    </div>-->
+<!--                  </a-upload>-->
+
                   <a-upload-dragger
                     name="file"
                     accept="image/*"
-                    :multiple="false"
+                    :multiple="true"
                     :before-upload="beforeUpload"
                     v-model:file-list="fileList"
                   >
@@ -146,12 +173,14 @@
 </template>
 
 <script setup>
-  import { message } from 'ant-design-vue';
-  import { createApi, listApi, updateApi, deleteApi } from '/@/api/thing';
-  import { listApi as listClassificationApi } from '/@/api/classification';
-  import { listApi as listDoctorApi } from '/@/api/doctor';
-  import { BASE_URL } from '/@/store/constants';
-  import { FileImageOutlined } from '@ant-design/icons-vue';
+import {message} from 'ant-design-vue';
+import {createApi, deleteApi, listApi, updateApi} from '/@/api/thing';
+import {listApi as listClassificationApi} from '/@/api/classification';
+import {listApi as listDoctorApi} from '/@/api/doctor';
+import {BASE_URL} from '/@/store/constants';
+import {FileImageOutlined} from '@ant-design/icons-vue';
+import {compressImage} from '/@/utils/imageDeal';
+// 引入封装的图片压缩工具
 
 
 
@@ -203,7 +232,7 @@
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      customRender: ({ text, record, index, column }) => (text === '0' ? '上架' : '下架'),
+      // customRender: ({ text, record, index, column }) => (text === '0' ? '上架' : '下架'),
     },
     {
       title: '操作',
@@ -215,14 +244,45 @@
     },
   ]);
 
-  const beforeUpload = (file) => {
+
+  const loading = false;
+  const imageUrl = '';
+  const beforeUpload = async (file) => {
+    // 检查文件大小，例如限制为5MB
+    const maxSize = 1 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      message.error('文件大小超过限制（1MB）');
+      return false;
+    }
+
     // 改文件名
     const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
     const copyFile = new File([file], fileName);
     console.log(copyFile);
     modal.form.imageFile = copyFile;
+    // 将压缩后的文件赋值给表单数据
+    // modal.form.imageFile = await compressImage(file);
+    console.log("赋值的表单文件数据： "+ this.form.imageFile);
     return false;
   };
+// const handleChange = (info: UploadChangeParam) => {
+//   if (info.file.status === 'uploading') {
+//     loading.value = true;
+//     return;
+//   }
+//   if (info.file.status === 'done') {
+//     // Get this url from response in real world.
+//     getBase64(info.file.originFileObj, (base64Url: string) => {
+//       imageUrl.value = base64Url;
+//       loading.value = false;
+//     });
+//   }
+//   if (info.file.status === 'error') {
+//     loading.value = false;
+//     message.error('upload error');
+//   }
+// };
+
 
   // 文件列表
   const fileList = ref([]);
@@ -382,10 +442,14 @@
       });
   };
 
+
+  //确认修改按钮  提交修改
   const handleOk = () => {
+    console.log("确认提交修改数据信息  ");
     myform.value
       ?.validate()
       .then(() => {
+        console.log(modal.form);
         const formData = new FormData();
         if (modal.editFlag) {
           formData.append('id', modal.form.id);
@@ -399,12 +463,14 @@
         }
         if (modal.form.imageFile) {
           formData.append('imageFile', modal.form.imageFile);
+          console.log("要上传的压缩图片文件内容   :" + modal.form.imageFile);
         }
         formData.append('description', modal.form.description || '');
         formData.append('price', modal.form.price || '');
         formData.append('youxiaoqi', modal.form.youxiaoqi || '');
         formData.append('shiyong', modal.form.shiyong || '');
         formData.append('tishi', modal.form.tishi || '');
+
         if (modal.form.status) {
           formData.append('status', modal.form.status);
         }
@@ -415,6 +481,7 @@
             .then((res) => {
               hideModal();
               getDataList();
+              message.info('更新成功');
             })
             .catch((err) => {
               console.log(err);
@@ -425,6 +492,7 @@
             .then((res) => {
               hideModal();
               getDataList();
+              message.info('创建成功');
             })
             .catch((err) => {
               console.log(err);
@@ -470,4 +538,18 @@
   .table-operations > button {
     margin-right: 8px;
   }
+   .avatar-uploader > .ant-upload {
+     width: 128px;
+     height: 128px;
+   }
+  .ant-upload-select-picture-card i {
+    font-size: 32px;
+    color: #999;
+  }
+
+  .ant-upload-select-picture-card .ant-upload-text {
+    margin-top: 8px;
+    color: #666;
+  }
+
 </style>

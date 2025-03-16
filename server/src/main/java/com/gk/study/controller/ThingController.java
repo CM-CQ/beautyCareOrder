@@ -179,6 +179,7 @@ public class ThingController {
         return new APIResponse(ResponeCode.SUCCESS, "成功");
     }
 
+    //保存上传图片文件
     public String saveThing(Thing thing) throws IOException {
         MultipartFile file = thing.getImageFile();
         String newFileName = null;
