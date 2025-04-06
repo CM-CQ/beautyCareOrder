@@ -50,6 +50,8 @@ public class Order implements Serializable {
     @TableField(exist = false)
     public String timeSlot ; // 预约时间段
     @TableField(exist = false)
+    public String doctorName ; // 医师姓名
+    @TableField(exist = false)
     public String title; // 商品名称
     @TableField(exist = false)
     public String cover; // 商品封面

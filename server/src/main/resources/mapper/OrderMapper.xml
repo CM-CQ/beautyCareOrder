@@ -11,10 +11,11 @@
     </select>
 
     <select id="getList" resultType="com.gk.study.entity.Order">
-        select A.*, B.username, C.title
+        select A.*, B.username, C.title, bd.title doctorName
         from b_order as A
         join b_user as B on (A.user_id=B.id)
         join b_thing as C on (A.thing_id=C.id)
+        left join b_doctor as bd on (A.doctor_id = bd.id)
         order by A.order_time desc;
     </select>
 
