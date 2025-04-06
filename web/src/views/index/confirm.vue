@@ -27,10 +27,42 @@
         </div>
         <input v-model="pageData.receiverName" placeholder="请输入姓名" class="name" />
 
+<!--     增加医师和时间段的选择-->
+        <div class="title flex-view">
+          <h3>选择医师</h3>
+        </div>
+        <select v-model="pageData.doctorId"  class="name" required>
+          <option value="" disabled selected>请选择医师</option>
+          <option v-for="doctor in doctors" :key="doctor.id" :value="doctor.id">
+            {{ doctor.name }}
+          </option>
+        </select>
+
+        <div class="title flex-view">
+          <h3>预约日期</h3>
+        </div>
+        <a-date-picker
+            v-model:value="pageData.appointmentDate"
+            placeholder="选择日期"
+            class="name"
+            :disabledDate="disabledDate"
+            format="YYYY-MM-DD"
+        />
+
+        <div class="title flex-view">
+          <h3>时间段</h3>
+        </div>
+        <select v-model="pageData.timeSlot" class="name" required>
+          <option value="" disabled selected>请选择时间段</option>
+          <option v-for="slot in timeSlots" :key="slot" :value="slot">
+            {{ slot }}
+          </option>
+        </select>
+
         <div class="title flex-view">
           <h3>联系电话</h3>
         </div>
-        <input v-model="pageData.receiverPhone" placeholder="请输入手机号" class="name" />
+        <input v-model="pageData.receiverPhone" maxlength="11" placeholder="请输入手机号" class="name" />
 
         <div class="title flex-view">
           <h3>备注</h3>
@@ -78,10 +110,25 @@
   import DeleteIcon from '/@/assets/images/delete-icon.svg';
   import { createApi } from '/@/api/order';
   import { useUserStore } from '/@/store';
+  import { listApi } from "/@/api/doctor";
 
   const router = useRouter();
   const route = useRoute();
   const userStore = useUserStore();
+
+  //加载页面时 从后台获取 医师列表
+  const doctors = ref([
+    { id: 1, name: '张医师' },
+    { id: 2, name: '李医师' },
+    { id: 3, name: '王医师' },
+  ]);
+  const timeSlots = ref([
+    '09:00-11:00',
+    '13:00-15:00',
+    '15:00-17:00',
+    '18:00-20:00',
+  ]);
+
 
   const pageData = reactive({
     id: undefined,
@@ -94,17 +141,44 @@
     receiverName: undefined,
     receiverPhone: undefined,
     receiverAddress: undefined,
+    doctorId: undefined,
+    appointmentDate: undefined,
+    timeSlot: undefined,
   });
 
   const myform = ref();
 
-  onMounted(() => {
+  onMounted(async() => {
     pageData.id = route.query.id;
     pageData.title = route.query.title;
     pageData.cover = route.query.cover;
     pageData.price = route.query.price;
     pageData.amount = pageData.price;
+
+    // 获取医生列表
+    try {
+      listApi()
+        .then((res) => {
+          doctors.value = res.data.map(doctor => ({
+          id: doctor.id,
+          name: doctor.title, // 假设你想用 title 作为医生名称
+          }));
+        })
+        .catch((err) => {
+          message.error('获取医生列表失败：' + err);
+        });
+    } catch (error) {
+      message.error('网络错误，请稍后再试');
+      console.error(error);
+    }
+
   });
+
+  // 禁用日期选择器中过去的时间
+  const disabledDate = (current) => {
+    // 只能选择将来的时间
+    return current && current < new Date();
+  };
 
   // 恢复表单初始状态
   const resetModal = () => {
@@ -130,6 +204,19 @@
       message.warn('请输入姓名！');
       return;
     }
+    if (!pageData.doctorId) {
+      message.warn('请选择医师！');
+      return;
+    }
+    console.log(pageData,"页面数据")
+    // if (!pageData.appointmentDate) {
+    //   message.warn('请选择预约日期！');
+    //   return;
+    // }
+    if (!pageData.timeSlot) {
+      message.warn('请选择预约时间段！');
+      return;
+    }
     formData.append('userId', userId);
     formData.append('thingId', pageData.id);
     formData.append('count', pageData.count);
@@ -137,6 +224,9 @@
     formData.append('receiverName', pageData.receiverName || '');
     formData.append('receiverPhone', pageData.receiverPhone || '');
     formData.append('receiverAddress', pageData.receiverAddress || '');
+    formData.append('doctorId', pageData.doctorId); // 新增字段 医师id
+    formData.append('appointmentDate', pageData.appointmentDate); // 新增字段 预约日期
+    formData.append('timeSlot', pageData.timeSlot); // 新增字段 时间段
     console.log(formData);
     createApi(formData)
       .then((res) => {
@@ -150,6 +240,17 @@
 </script>
 
 <style scoped lang="less">
+select {
+  width: 100%;
+  background: #f6f9fb;
+  border: 0;
+  border-radius: 4px;
+  padding: 6px 12px;
+  margin-top: 16px;
+  height: 30px;
+  line-height: 22px;
+}
+
   .flex-view {
     display: -webkit-box;
     display: -ms-flexbox;

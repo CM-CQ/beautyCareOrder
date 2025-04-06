@@ -2,7 +2,7 @@
   <div id="userLayout">
     <div class="user-layout-header">
       <img class="logo" src="/src/assets/images/ic-admin-logo.png" />
-      <span>后台管理系统</span>
+      <span>美容预约后台管理系统</span>
     </div>
     <div class="main-container">
       <div class="main">
