@@ -7,12 +7,18 @@ import com.gk.study.mapper.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements OrderService {
     @Autowired
     OrderMapper mapper;
+
+    @Override
+    public int checkRepeat(Long doctorId, LocalDateTime orderStartTime, LocalDateTime orderEndTime){
+        return mapper.getRepeat(doctorId, orderStartTime, orderEndTime);
+    }
 
     @Override
     public List<Order> getOrderList() {

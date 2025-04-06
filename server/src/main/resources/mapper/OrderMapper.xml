@@ -2,6 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gk.study.mapper.OrderMapper">
 
+    <select id="getRepeat" resultType="Integer">
+        SELECT COUNT(*)
+        FROM b_order
+        WHERE doctor_id = #{doctorId}
+        AND order_start_time = #{orderStartTime}
+        AND order_end_time = #{orderEndTime}
+    </select>
+
     <select id="getList" resultType="com.gk.study.entity.Order">
         select A.*, B.username, C.title
         from b_order as A
