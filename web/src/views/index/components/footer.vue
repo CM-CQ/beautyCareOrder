@@ -23,7 +23,7 @@
       handleSource() {
         Modal.info({
           title: '欢迎体验',
-          content: '使用过程中遇到问题，可以咨询作者：lengqin1024（微信）',
+          content: '使用过程中遇到问题，可以咨询作者',
           onOk() {},
         });
       },
